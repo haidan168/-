@@ -2369,7 +2369,118 @@ console.log(str[1]);//x
 > docum.querySelectAll(".box1")
 > ```
 
+### 2. DOM 增删改
 
+> - createElement()
+>   - 可以用于创建一个元素节点对象
+>   - 需要一个标签名作为参数，将会根据该标签名创建元素节点对象
+>   - 并将创建好的对象作为返回值返回
+>
+> ```
+> var li = document.createElement("li")
+> ```
+
+> - createTextNode()
+>   - 可以用来创建一个文本节点对象
+>   - 需要一个文本内容作为参数，将会根据该内容创建文本节点
+>   - 并将新的节点返回
+>
+> ```
+> var text = document.createTextNode("dx")
+> ```
+
+> - appendChild()
+>   - 向一个父节点中添加一个新的子节点
+>   - 语法：
+>     - 父节点.appendChild(子节点)
+>
+> ```
+> li.appendChild(text);
+> ```
+
+```
+var father = document.getElementById("father");
+var li document.createElement("li");
+li.innerHTML = "dx";
+father.appendChild(li);
+```
+
+> - insertBefore()
+>   - 在指定的子节点前插入新的子节点
+>   - 语法：
+>     - 父节点.insertBefore(新节点,旧节点)
+
+------
+
+> - replaceChild()
+>   - 可以使用指定的子节点替换已有的子节点
+>   - 语法：
+>     - 父节点.replaceChild(新节点,旧节点)
+
+------
+
+> - removeChild()
+>   - 可以删除一个子节点
+>   - 语法：
+>     - 父节点.removeChild(子节点)
+>     - 子节点.parentNode.removeChild(子节点)
+
+### 3. 修改CSS样式
+
+> - 读取元素的样式:
+>   - 语法：
+>     - 元素.style.样式名
+>   - 通过style属性设置和读取的都是内联样式
+>     - 无法读取样式表中的样式
+
+> - 通过JS修改元素的样式：
+>   - 语法：
+>     - 元素.style.样式名 = 样式值
+>   - 注意：如果CSS的样式名中含有-，在JS中是不合法的比如background-color
+>     - 需要将这种样式名修改为驼峰命名法：去掉-，然后将-后的字母大写
+>   - 通过style属性设置的样式都是内联样式
+>     - 但是如果在样式中写了!important，则此时样式会有最高的优先级
+>     - 通过JS也不能覆盖该样式，此时将会导致JS修改样式失效
+
+------
+
+> - 获取元素的当前显示的样式:
+>   - 语法：
+>     - 素.currentStyle.样式名
+>   - 可以用来读取当前元素正在显示的样式
+>     - 如果当前元素没有设置该样式，则获取它的默认值
+>   - currentStyle只有IE浏览器支持，其他的浏览器都不支持
+
+> - getComputedStyle()
+>   - 这个方法来获取元素当前的样式
+>   - 这个方法是window的方法，可以直接使用
+>   - 需要两个参数：
+>     - 第一个：要获取样式的元素
+>     - 第二个：可以传递一个伪元素，一般都传null
+>   - 该方法会返回一个对象，对象中封装了当前元素对应的样式
+>   - 可以通过对象.样式名来读取样式
+>   - 如果获取的样式没有设置，则会获取到真实的值，而不是默认值
+>     - 没有设置width，它不会获取到auto，而是一个长度
+> - 该方法不支持IE8及以下的浏览器
+
+- 通过currentStyle和getComputedStyle()读取到的样式都是只读的，不能修改
+- 如果要修改必须通过style属性
+
+> - 兼容浏览器
+>
+> ```
+> // obj 要获取样式的元素
+> // name 要获取的样式名
+> fun getStyle(obj,name){
+> 	if(window.getComputedStyle){
+> 		return obj.getComputedStyle(obj,null)[name];
+> 	}else{
+> 		return obj.currentStyle[name];
+> 	}
+> }
+> ```
+>
+> 
 
 ## 事件
 
