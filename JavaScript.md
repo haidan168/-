@@ -2480,8 +2480,329 @@ father.appendChild(li);
 > }
 > ```
 >
-> 
+
+------
+
+> - clientWidth
+> - clientHeight
+>   - 这两个属性可以获取元素的可见宽度和高度
+>   - 这些属性都是不带px的，返回都是一个数字，可以直接进行计算
+>   - 会获取元素宽度和高度，包括内容区和内边距
+>   - 这些属性都是只读的，不能修改
+
+> - offsetWidth
+> - offsetHeight
+>   - 获取元素的整个的宽度和高度，包括内容区、内边距和边框
+> - offsetParent
+>   - 可以用来获取当前元素的定位父元素
+>   - 会获取到离当前元素最近的开启了定位的祖先元素
+>   - 如果所有的祖先元素都没有开启定位，则返回body
+> - offsetLeft
+>   - 当前元素相对于其定位父元素的水平偏移量
+> - offsetTop
+>   - 当前元素相对于其定位父元素的垂直偏移量
+
+> - scrollWidth
+> - scrollHeight
+>   - 可以获取元素整个滚动区域的宽度和高度
+> - scrollLeft
+>   - 可以获取水平滚动条滚动的距离
+> - scrollTop
+>   - 可以获取垂直滚动条滚动的距离
+>
+> ```
+> //说明垂直滚动条滚动到底了
+> scrollHeight - scrollTop == clientHeight
+> ```
+>
+> ```
+> //说明水平滚动条滚动到底
+> scrollWidth - scrollLeft == clientWidth
+> ```
+>
 
 ## 事件
 
+- 当事件的响应函数被触发时，浏览器每次都会将一个事件对象作为实参传递进响应函数
+- 在事件对象中封装了当前事件相关的一切信息，比如：鼠标的坐标
+- 在IE8中，响应函数被处罚时，浏览器不会传递事件对象
+  - 是将事件对象作为window对象的属性保存的
+
+```
+body.onmousemove = function(event){
+	// 解决事件对象的兼容性问题
+	event = event || window.event;
+}
+```
+
+> - clientX和clientY
+>   - 用于获取鼠标在当前的可见窗口的坐标
+> - pageX和pageY
+>   - 可以获取鼠标相对于当前页面的坐标
+>     - 在IE8中不支持
+
+### 1. 冒泡
+
+- 指的就是事件的**向上传导**，当后代元素上的事件被触发时，其祖先元素的**相同事件**也会被触发
+- 如果不希望发生事件冒泡可以通过事件对象来取消冒泡
+  - 可以将事件对象的cancelBubble设置为true，即可取消冒泡
+
+```
+div.onclick = function(event){
+	event = event || window.event;
+	event.cancleBubble = true;
+}
+```
+
+### 2. 委派
+
+- 指将事件统一绑定给元素的共同的祖先元素
+- 当后代元素上的事件触发时，会一直冒泡到祖先元素
+  - 通过祖先元素的响应函数来处理事件
+  - 事件委派是利用了冒泡，通过委派可以减少事件绑定的次数，提高程序的性能
+- 因为绑定的是祖先元素，所有点击子元素都会冒泡到父元素，需要对触发事件进行判断
+
+> - target
+>   - event中的target表示的触发事件的对象
+
+```
+<button id="btn">添加超链接</button>
+<ul id="ul">
+	<li><p><span>123</span></p></li>
+	<li><p><a href="#" class="link">超链接</a></p></li>
+	<li><p><a href="#" class="link">超链接</a></p></li>
+	<li><p><a href="#" class="link">超链接</a></p></li>
+</ul>
+```
+
+```
+var btn = document.getElementById("btn");
+var ul = document.getElementById("ul");
+btn.onclick = function(){
+	var li = document.createElement("li");
+	li.innerHTML = "<p><a href='#'' class='link'>新超链接</a></p>"
+	ul.appendChild(li);
+}
+ul.onclick = function(event){
+	event = event || window.event;
+	if(event.target.className == "link"){
+		alert("===");
+	}
+}
+```
+
+### 3. 绑定
+
+> - 使用 对象.事件 = 函数 的形式绑定响应函数
+>   - 只能同时为一个元素的一个事件绑定一个响应函数
+>   - 不能绑定多个，如果绑定了多个，则后边会覆盖掉前边的
+
+- addEventListener()
+
+  - 可以为元素绑定响应函数
+
+  - 参数：
+
+    1. 事件的字符串，不要on
+
+    2. 回调函数，当事件触发时该函数会被调用
+    3. 是否在捕获阶段触发事件，需要一个布尔值，一般都传false
+
+  - 使用addEventListener()可以同时为一个元素的相同事件同时绑定多个响应函数
+
+  - 当事件被触发时，响应函数将会按照函数的绑定顺序执行
+
+  - 不支持IE8及以下的浏览器
+
+```
+var btn = document.getElementById("btn");
+btn.addEventListener("click", function(){
+		alert(this);// 绑定事件的对象
+}, false)
+```
+
+- attachEvent()
+  - 在IE8中可以使用attachEvent()来绑定事件
+  - 参数：
+    1. 事件的字符串，要on
+    2. 回调函数
+  - 这个方法也可以同时为一个事件绑定多个处理函数
+  - 不同的是它是后绑定先执行，执行顺序和addEventListener()相反
+
+```
+var btn = document.getElementById("btn");
+btn.attachEvent("onclick", function(){
+		alert(this);// window 对象
+})
+```
+
+> - 兼容
+>
+> ```
+> /*
+>  * 参数：
+>  * 	obj 要绑定事件的对象
+>  * 	eventStr 事件的字符串(不要on)
+>  *  callback 回调函数
+>  */
+> function bind(obj,EventStr,callback){
+> 	if(obj.addEventListener) {
+> 		obj.addEventListener(EventStr, callback, false)
+> 	}else {
+> 		obj.attachEvent("on"+EventStr,function(){
+> 			callback.call(obj);
+> 		})
+> 	}
+> }
+> var btn = document.getElementById("btn");
+> bind(btn,"click",function(){
+> 	alert(this);
+> });
+> ```
+
+### 4. 传播
+
+- W3C将事件传播分成了三个阶段：
+  1. 捕获阶段
+     - 在捕获阶段时从最外层的祖先元素，向目标元素进行事件的捕获，但是默认此时不会触发事件
+  2. 目标阶段
+     - 事件捕获到目标元素，捕获结束开始在目标元素上触发事件
+  3. 冒泡阶段
+     - 事件从目标元素向他的祖先元素传递，依次触发祖先元素上的事件
+- 如果希望在捕获阶段就触发事件，可以将addEventListener()的第三个参数设置为true
+
+### 5. 键盘事件
+
+- onkeydown
+  - 按键被按下
+  - 对于onkeydown来说如果一直按着某个按键不松手，则事件会一直触发
+  - 当onkeydown连续触发时，第一次和第二次之间会间隔稍微长一点，其他的会非常的快
+    - 这种设计是为了防止误操作的发生
+- onkeyup
+  - 按键被松开
+- 键盘事件一般都会绑定给一些可以获取到焦点的对象或者是document
+
+> - keyCode
+>   - 获取按键的编码
+> - altKey
+> - ctrlKey
+> - shiftKey
+>   - 这个三个用来判断alt ctrl 和 shift是否被按下
+>   - 如果按下则返回true，否则返回false
+>
+> - 判断y和ctrl是否同时被按下
+>
+> ```
+> event.keyCode === 89 && event.ctrlKey
+> ```
+
+- 在文本框中输入内容，属于onkeydown的默认行为
+  - 如果在onkeydown中取消了默认行为，则输入的内容，不会出现在文本框中
+
 ## BOM
+
+- 浏览器对象模型
+- BOM可以使我们通过JS来操作浏览器
+- 在BOM中为我们提供了一组对象，用来完成对浏览器的操作
+  - Window
+    - 代表的是整个浏览器的窗口，同时window也是网页中的全局对象
+  - Navigator
+    - 代表的当前浏览器的信息，通过该对象可以来识别不同的浏览器
+  - Location
+    - 代表当前浏览器的地址栏信息，通过Location可以获取地址栏信息，或者操作浏览器跳转页面
+  - History
+    - 代表浏览器的历史记录，可以通过该对象来操作浏览器的历史记录
+    - 由于隐私原因，该对象不能获取到具体的历史记录，只能操作浏览器向前或向后翻页
+  - Screen
+    - 代表用户的屏幕的信息，通过该对象可以获取到用户的显示器的相关的信息
+- 这些BOM对象在浏览器中都是作为window对象的属性保存的，可以通过window对象来使用，也可以直接使用
+
+### 1. Navigator
+
+- 由于历史原因，Navigator对象中的大部分属性都已经不能帮助我们识别浏览器了
+
+> - 一般我们只会使用userAgent来判断浏览器的信息，不同的浏览器会有不同的userAgent
+> - userAgent是一个字符串，这个字符串中包含有用来描述浏览器信息的内容
+>
+> ```
+> navigator.appName
+> ```
+>
+> - 如果通过userAgent不能判断，还可以通过一些浏览器中特有的对象，来判断浏览器的信息
+> - 比如：ActiveXObject
+
+### 2. History
+
+- length
+  - 属性，可以获取到当前访问的链接数量
+- back()
+  - 可以用来回退到上一个页面，作用和浏览器的回退按钮一样
+- forward()
+  - 可以跳转下一个页面，作用和浏览器的前进按钮一样
+- go()
+  - 可以用来跳转到指定的页面
+  - 它需要一个整数作为参数
+    - 1:表示向前跳转一个页面 相当于forward()
+    - 2:表示向前跳转两个页面
+    - -1:表示向后跳转一个页面
+    - -2:表示向后跳转两个页面
+
+### 3. Location
+
+- 如果直接打印location，则可以获取到地址栏的信息（当前页面的完整路径）
+
+- 如果直接将location属性修改为一个完整的路径，或相对路径
+  - 则我们页面会自动跳转到该路径，并且会生成相应的历史记录
+
+```
+location = "http://www.baidu.com";
+```
+
+- assign()
+  - 用来跳转到其他的页面，作用和直接修改location一样
+
+```
+location.assign("http://www.baidu.com");
+```
+
+- reload()
+  - 用于重新加载当前页面，作用和刷新按钮一样
+  - 如果在方法中传递一个true，作为参数，则会强制清空缓存刷新页面
+- replace()
+  - 可以使用一个新的页面替换当前页面，调用完毕也会跳转页面
+  - 不会生成历史记录，不能使用回退按钮回退
+
+### 4. 定时调用
+
+- 如果希望一段程序，可以每间隔一段时间执行一次，可以使用定时调用
+- setInterval()
+  - 定时调用
+  - 可以将一个函数，每隔一段时间执行一次
+  - 参数：
+    1. 回调函数，该函数会每隔一段时间被调用一次
+    2. 每次调用间隔的时间，单位是毫秒
+  - 返回值：
+    - 返回一个Number类型的数据
+    - 这个数字用来作为定时器的唯一标识
+- clearInterval()
+  - 用来关闭一个定时器
+  - 方法中需要一个定时器的标识作为参数，这样将关闭标识对应的定时器
+
+### 5. 延时调用
+
+- 延时调用一个函数不马上执行，而是隔一段时间以后在执行，而且只会执行一次
+- 延时调用和定时调用的区别，定时调用会执行多次，而延时调用只会执行一次
+- 延时调用和定时调用实际上是可以互相代替的
+
+```
+var timer = setTimeout(function(){
+	console.log(num++);
+},3000);
+```
+
+- clearTimeout()来关闭一个延时调用
+
+```
+clearTimeout(timer);
+```
+
