@@ -2806,3 +2806,66 @@ var timer = setTimeout(function(){
 clearTimeout(timer);
 ```
 
+### 6. JSON
+
+> - JSON就是一个特殊格式的字符串，这个字符串可以被任意的语言所识别
+> - 可以转换为任意语言中的对象，JSON在开发中主要用来数据的交互
+
+- JSON
+  - JavaScript Object Notation JS对象表示法
+  - JSON和JS对象的格式一样，只不过JSON字符串中的属性名必须加双引号，其他的和JS语法一致
+  - JSON分类：
+    1. 对象 {}
+    2. 数组 []
+  - JSON中允许的值：
+    - 字符串
+    - 数值
+    - 布尔值
+    - null
+    - 对象
+    - 数组
+
+#### 6.1 json 转 js对象
+
+- JSON.parse()
+  - 可以将以JSON字符串转换为js对象
+  - 它需要一个JSON字符串作为参数，会将该字符串转换为JS对象并返回
+
+```
+var json = '{"name":"hebe","number":330}';
+var obj = JSON.parse(json);
+console.log(obj.name);//hebe
+```
+
+#### 6.2 js对象 转 json
+
+- JSON.stringify()
+  - 可以将一个JS对象转换为JSON字符串
+  - 需要一个js对象作为参数，会返回一个JSON字符串
+
+```
+var obj = {name:"dx",number:16};
+var json = JSON.stringify(obj);
+```
+
+#### 6.3 eval()
+
+- 这个函数可以用来执行一段字符串形式的JS代码，并将执行结果返回
+
+```
+var str2 = "alert('hello');";
+eval(str2);
+```
+
+- 如果使用eval()执行的字符串中含有{},它会将{}当成是代码块
+  - 如果不希望将其当成代码块解析，则需要在字符串前后各加一个()
+
+```
+var json = '{"name":"hebe","number":330}';
+var obj = eval("("+json+")");
+```
+
+- eval()这个函数的功能很强大，可以直接执行一个字符串中的js代码,但是它的执行性能比较差，然后它还具有安全隐患
+
+
+
