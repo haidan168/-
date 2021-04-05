@@ -1312,7 +1312,7 @@ console.log(result)//3
 
 ```
 var arr = ["hebe","dx","330","16"];
-var result = arr.pop();
+var result = arr.shift();
 console.log(arr);// ["dx","330","16"]
 console.log(result);//hebe
 ```
@@ -1892,7 +1892,7 @@ console.log(str[1]);//x
 > var result2 = str.slice(1,-2);
 > console.log(str);//dx8dx16
 > console.log(result1);//x
-> console.log(result2);//x8dx
+> console.log(result2);//dx8dx
 > ```
 
 > - substring()

@@ -400,7 +400,7 @@ function Sub(){
 	this.subName = "Sub";
 }
 Sub.prototype = new Super();
-Sub.constructor = Sub;
+Sub.prototype.constructor = Sub;
 Sub.prototype.showSub(){
 	console.log(this.subName)
 }
